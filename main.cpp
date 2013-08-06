@@ -18,10 +18,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-using namespace std;
-
+// main arguments are struct_dir, diff_dir, output_dir
 int main(int argc, char **argv) {
-	// main arguments are struct_dir, diff_dir, output_dir
+	using std::cerr;
+	using std::cin;
+	using std::cout;
+	using std::endl;
+	using std::string;
 
 	if (argc != 4) {
 		cout << "usage: ldfsl struct_dir diff_dir output_dir" << endl;
@@ -69,9 +72,7 @@ int main(int argc, char **argv) {
 	putenv(path);
 	putenv(fslparallel);
 
-	// declare some default directories
-	// const string dicom_diff = "~/Desktop/DICOMDAT/SDY00000/SRS00001/";
-	// const string dicom_struct = "~/Desktop/DICOMDAT/SDY00000/SRS00000/";
+	// declare default directories
 	const string bedpost_dir = destination_dir + ".bedpostX";
 	const string std_space = "/usr/share/fsl/data/standard/MNI152_T1_2mm_brain";
 	const string midbrain_mask =

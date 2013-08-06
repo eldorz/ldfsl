@@ -14,24 +14,28 @@
 #include <stdlib.h>
 #include <dirent.h>
 
-using namespace std;
-
-void systemCall(const string &command) {
+void systemCall(const std::string &command) {
 	int ret_val = system(command.c_str());
 	if (ret_val != 0) {
-		cerr << "Error: \nCommand issued: " << command << endl;
-		cerr << "Value returned: " << ret_val << endl;
+		std::cerr << "Error: \nCommand issued: " << command << std::endl;
+		std::cerr << "Value returned: " << ret_val << std::endl;
 		exit(EXIT_FAILURE);
 	}
 }
 
-void systemCall(const string &command, const string &message) {
-	cout << message << endl;
+void systemCall(const std::string &command, const std::string &message) {
+	std::cout << message << std::endl;
 	systemCall(command);
 }
 
 // warning this will work for 64 directions only
-bool bedpost_complete(const string &bedpost_dir) {
+bool bedpost_complete(const std::string &bedpost_dir) {
+	using std::cerr;
+	using std::cout;
+	using std::endl;
+	using std::string;
+	using std::vector;
+
 	static bool initialised = false;
 	static const string logdir = bedpost_dir + "/logs";
 	static vector<string> logsLeft;
@@ -47,7 +51,7 @@ bool bedpost_complete(const string &bedpost_dir) {
 		struct dirent *dirEntry;
 
 		if ((dirStream = opendir(logdir.c_str())) == NULL) {
-			cout << "Could not open log directory";
+			cout << "Could not open log directory" << endl;
 			exit(1);
 		}
 
@@ -56,7 +60,8 @@ bool bedpost_complete(const string &bedpost_dir) {
 			if (bpxNum == -1) {
 				auto found = entryString.find(bpxName);
 				if (found != string::npos) {
-					string digits = entryString.substr(bpxName.size(), entryString.size() - bpxName.size());
+					string digits = entryString.substr(bpxName.size(),
+							entryString.size() - bpxName.size());
 					bpxNum = stoi(digits);
 					bpxName.append(digits);
 				}
@@ -64,8 +69,10 @@ bool bedpost_complete(const string &bedpost_dir) {
 			if (bedpostNum == -1) {
 				auto found = entryString.find(bedpostName);
 				if (found != string::npos) {
-					auto secondDot = entryString.find(".", found + bedpostName.size());
-					string digits = entryString.substr(bedpostName.size(), secondDot - bedpostName.size());
+					auto secondDot = entryString.find(".", found
+							+ bedpostName.size());
+					string digits = entryString.substr(bedpostName.size(),
+							secondDot - bedpostName.size());
 					bedpostNum = stoi(digits);
 					bedpostName.append(digits).append(".");
 				}
@@ -75,7 +82,7 @@ bool bedpost_complete(const string &bedpost_dir) {
 		// set up our vector of logs to check
 
 		for (int i = 1; i <= 65; i++) {
-			string digit = to_string(i);
+			string digit = std::to_string(i);
 			string filename = logdir + "/" + bedpostName + digit;
 			logsLeft.push_back(filename);
 		}
@@ -87,7 +94,7 @@ bool bedpost_complete(const string &bedpost_dir) {
 	auto iter = logsLeft.begin();
 	while (iter != logsLeft.end()) {
 
-		ifstream file(*iter);
+		std::ifstream file(*iter);
 
 		if (file) {
 			string data;
@@ -111,7 +118,7 @@ bool bedpost_complete(const string &bedpost_dir) {
 	if (logsLeft.size() == 0) {
 		string filename = logdir;
 		filename.append("/").append(bpxName);
-		ifstream file(filename);
+		std::ifstream file(filename);
 		if (file) {
 			string data;
 			while (file >> data) {
