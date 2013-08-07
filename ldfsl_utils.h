@@ -15,5 +15,6 @@ void systemCall(const std::string &command, const std::string &message);
 
 bool bedpost_complete(const std::string &bedpost_dir); // checks log files and
 										// determines if bedpost has finished
+void printElapsedTime(clock_t start);
 
 #endif /* LDFSL_UTILS_H_ */

@@ -11,6 +11,8 @@
 
 #include "ldfsl_utils.h"
 #include "stdlib.h"
+
+#include <ctime>
 #include <iostream>
 #include <string>
 
@@ -25,6 +27,9 @@ int main(int argc, char **argv) {
 	using std::cout;
 	using std::endl;
 	using std::string;
+
+	// time how long this all takes
+	time_t start = time(nullptr);
 
 	if (argc != 4) {
 		cout << "usage: ldfsl struct_dir diff_dir output_dir" << endl;
@@ -199,6 +204,7 @@ int main(int argc, char **argv) {
 	// call mcverter to convert DICOM to nii, quit on error, rename files
 
 	systemCall(struct_to_nii, "converting mprage to nii format...");
+	printElapsedTime(start);
 	systemCall(rename_struct_1);
 	systemCall(remove_extra_structs);
 	systemCall(diff_to_nii, "converting dti to nii format...");
@@ -208,6 +214,8 @@ int main(int argc, char **argv) {
 	systemCall(rename_bval);
 
 	cout << "Forking processes..." << endl;
+	printElapsedTime(start);
+
 	pid_t childpid = fork();
 	if (childpid < 0) {
 		cerr << "First fork failed" << endl;
@@ -226,6 +234,7 @@ int main(int argc, char **argv) {
 		systemCall(bet_struct, "child brain-segmenting structural volume...");
 
 		cout << "child done, joining parent..." << endl;
+		printElapsedTime(start);
 		exit(0);
 	} else {
 		// I am the parent process
@@ -237,6 +246,7 @@ int main(int argc, char **argv) {
 		// eddy correction
 		systemCall(eddy_correct, "parent performing motion and eddy "
 				"correction...");
+		printElapsedTime(start);
 
 		// two-crossing-fibre analysis
 		systemCall(bedpost, "parent performing crossing fibre analysis "
@@ -244,6 +254,7 @@ int main(int argc, char **argv) {
 
 		// wait until we are happy that bedpost is complete
 		while (!bedpost_complete(bedpost_dir)) {
+			printElapsedTime(start);
 			usleep(1000000 * 60); // 60 secs
 		}
 
@@ -263,6 +274,8 @@ int main(int argc, char **argv) {
 	systemCall(str2standard);
 
 	cout << "Forking processes again..." << endl;
+	printElapsedTime(start);
+
 	childpid = fork();
 	if (childpid < 0) {
 		cerr << "Second fork failed" << endl;
@@ -293,18 +306,21 @@ int main(int argc, char **argv) {
 		// perform probabilistic tracking corticospinal tract
 		systemCall(clear_cst_dir);
 		systemCall(make_cst_dir);
+		printElapsedTime(start);
 		systemCall(probtrack_cst, "parent performing probabilistic tracking "
 				"corticospinal tract (this may take hours)...");
 
 		// perform probabilistic tracking right optic radiation
 		systemCall(clear_r_or_dir);
 		systemCall(make_r_or_dir);
+		printElapsedTime(start);
 		systemCall(probtrack_r_or, "parent performing probabilistic tracking "
 				"right optic radiation (this may take hours)...");
 
 		// perform probabilistic tracking right optic radiation
 		systemCall(clear_l_or_dir);
 		systemCall(make_l_or_dir);
+		printElapsedTime(start);
 		systemCall(probtrack_l_or, "parent performing probabilistic tracking "
 				"left optic radiation (this may take hours)...");
 
@@ -318,8 +334,9 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	printElapsedTime(start);
+
 	// display result in fslview
 	systemCall(fslview);
-
 	cout << "Done" << endl;
 }

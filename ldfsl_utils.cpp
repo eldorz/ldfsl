@@ -7,12 +7,16 @@
  *  Utility functions for ldfsl
  */
 
+#include <ctime>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <fstream>
+
 #include <stdlib.h>
 #include <dirent.h>
+
+#include "ldfsl_utils.h"
 
 void systemCall(const std::string &command) {
 	int ret_val = system(command.c_str());
@@ -26,6 +30,22 @@ void systemCall(const std::string &command) {
 void systemCall(const std::string &command, const std::string &message) {
 	std::cout << message << std::endl;
 	systemCall(command);
+}
+
+void printElapsedTime(time_t start) {
+	using std::cout;
+	using std::endl;
+
+	time_t now = time(nullptr);
+	int elapsed = static_cast<int>(difftime(now, start));
+
+	int hours = elapsed / 3600;
+	elapsed -= hours * 3600;
+	int mins = elapsed / 60;
+	int secs = elapsed - mins * 60;
+
+	cout << "Time elapsed: " << hours << "h " << mins << "m " << secs
+			<< "s" << endl;
 }
 
 // warning this will work for 64 directions only
