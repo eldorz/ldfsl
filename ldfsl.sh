@@ -244,4 +244,8 @@ end_time=`date +%s`
 elapsed=`expr \( $end_time - $start_time \) / 60`
 echo "$0 has taken $elapsed minutes" 
 echo "finished all at $elapsed min" >> $out_dir/ldfsl.log
-       
+
+# launch fslview
+fslview $out_dir/mprage_std -b 0,1000 $out_dir/cst/fdt_paths -b 1000,5000 \
+  $out_dir/right_or/fdt_paths -b 1000,5000 \
+  $out_dir/left_or/fdt_paths -b 1000,5000       
