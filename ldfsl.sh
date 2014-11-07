@@ -155,11 +155,11 @@ fi
 wait $str_process
 
 # generate registration transforms
+std_space=/usr/share/fsl/data/standard/MNI152_T1_2mm_brain
+bedpost_dir=$out_dir.bedpostX
 if ! grep 'finished registration transforms' $out_dir/ldfsl.log > /dev/null
 then
   echo "$0: performing registration transforms..."
-  std_space=/usr/share/fsl/data/standard/MNI152_T1_2mm_brain
-  bedpost_dir=$out_dir.bedpostX
   flirt -in $bedpost_dir/nodif_brain -ref $out_dir/mprage_brain.nii.gz \
     -omat $bedpost_dir/xfms/diff2str.mat -searchrx -90 90 -searchry -90 90
   convert_xfm -omat $bedpost_dir/xfms/str2diff.mat \
@@ -188,7 +188,7 @@ flirt -in $out_dir/mprage_brain.nii.gz -applyxfm \
 if ! grep 'finished tracking' $out_dir/ldfsl.log > /dev/null
 then
   (
-  rm -r $out_dir/cst
+  [ -d $out_dir/cst ] && rm -r $out_dir/cst
   mkdir -p $out_dir/cst
   midbrain_mask=/home/brain/fsl/templates/std_midbrain.nii.gz
   waypoints_list=/home/brain/fsl/templates/waypoints.txt
@@ -202,11 +202,11 @@ then
 
   # perform probabilistic tracking right optic radiation
   (
-  rm -r $out_dir/right_or
+  [ -d $out_dir/right_or ] && rm -r $out_dir/right_or
   mkdir -p $out_dir/right_or
   r_lat_gen_bod=/home/brain/fsl/templates/right_lateral_geniculate_body.nii.gz
   r_or_waypoints_list=/home/brain/fsl/templates/r_or_waypoints.txt
-  probtrackx2  -x r_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
+  probtrackx2  -x $r_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
     --steplength=0.5 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 \
     --xfm=$bedpost_dir/xfms/standard2diff.mat --forcedir --opd \
     -s $bedpost_dir/merged -m $bedpost_dir/nodif_brain_mask \
@@ -216,15 +216,15 @@ then
 
   # perform probabilistic tracking left optic radiation
   (
-  rm -r $out_dir/left_or
+  [ -d $out_dir/left_or ] && rm -r $out_dir/left_or
   mkdir -p $out_dir/left_or
   l_lat_gen_bod=/home/brain/fsl/templates/left_lateral_geniculate_body.nii.gz
   l_or_waypoints_list=/home/brain/fsl/templates/l_or_waypoints.txt
-  probtrackx2  -x l_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
+  probtrackx2  -x $l_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
     --steplength=0.5 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 \
     --xfm=$bedpost_dir/xfms/standard2diff.mat --forcedir --opd \
     -s $bedpost_dir/merged -m $bedpost_dir/nodif_brain_mask \
-    --dir=$out_dir/left_or --waypoints=$r_or_waypoints_list --waycond=AND
+    --dir=$out_dir/left_or --waypoints=$l_or_waypoints_list --waycond=AND
   )&
   lor_process=$!
   
