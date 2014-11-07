@@ -173,16 +173,16 @@ then
     -concat $bedpost_dir/xfms/str2standard.mat $bedpost_dir/xfms/diff2str.mat
   convert_xfm -omat $bedpost_dir/xfms/standard2diff.mat \
     -inverse $bedpost_dir/xfms/diff2standard.mat
+  # transform structural to standard space
+  flirt -in $out_dir/mprage_brain.nii.gz -applyxfm \
+    -init $bedpost_dir/xfms/str2standard.mat -out $out_dir/mprage_std.nii.gz \
+    -paddingsize 0.0 -interp trilinear -ref $std_space
   # write to log
   end_time=`date +%s`
   elapsed=`expr \( $end_time - $start_time \) / 60`
   echo "finished registration transforms at $elapsed min" >> $out_dir/ldfsl.log
 fi
 
-# transform structural to standard space
-flirt -in $out_dir/mprage_brain.nii.gz -applyxfm \
-  -init $bedpost_dir/xfms/str2standard.mat -out $out_dir/mprage_std.nii.gz \
-  -paddingsize 0.0 -interp trilinear -ref $std_space
 
 # perform probabilistic tracking corticospinal tract
 if ! grep 'finished tracking' $out_dir/ldfsl.log > /dev/null
@@ -241,9 +241,10 @@ fi
   
 # print elapsed time
 end_time=`date +%s`
-elapsed=`expr \( $end_time - $start_time \) / 60`
-echo "$0 has taken $elapsed minutes" 
-echo "finished all at $elapsed min" >> $out_dir/ldfsl.log
+hours_elapsed=`expr \( $end_time - $start_time \) / 3600`
+mins_elapsed=`expr \( $end_time - $start_time - $hours_elapsed \* 3600 \) / 60`
+echo "$0 has taken $hours_elapsed h $mins_elapsed m" 
+echo "finished all at $hours_elapsed h $mins_elapsed m" >> $out_dir/ldfsl.log
 
 # launch fslview
 fslview $out_dir/mprage_std -b 0,1000 $out_dir/cst/fdt_paths -b 1000,5000 \
