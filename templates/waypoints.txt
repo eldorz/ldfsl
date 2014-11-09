@@ -1,0 +1,1 @@
+/home/brain/fsl/templates/std_precentral_gyrus.nii.gz

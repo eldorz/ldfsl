@@ -1,0 +1,2 @@
+/home/brain/fsl/templates/right_visual_cortex.nii.gz
+

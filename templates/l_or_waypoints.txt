@@ -1,0 +1,1 @@
+/home/brain/fsl/templates/left_visual_cortex.nii.gz
