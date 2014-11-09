@@ -185,13 +185,15 @@ fi
 
 
 # perform probabilistic tracking corticospinal tract
+# NB change template directory as required
+template_dir=/home/brain/workspace/ldfsl/templates
 if ! grep 'finished tracking' $out_dir/ldfsl.log > /dev/null
 then
   (
   [ -d $out_dir/cst ] && rm -r $out_dir/cst
   mkdir -p $out_dir/cst
-  midbrain_mask=/home/brain/fsl/templates/std_midbrain.nii.gz
-  waypoints_list=/home/brain/fsl/templates/waypoints.txt
+  midbrain_mask=$template_dir/std_midbrain.nii.gz
+  waypoints_list=$template_dir/waypoints.txt
   probtrackx2  -x $midbrain_mask -l --onewaycondition -c 0.2 -S 2000 \
     --steplength=0.5 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 \
     --xfm=$bedpost_dir/xfms/standard2diff.mat --forcedir --opd \
@@ -204,8 +206,8 @@ then
   (
   [ -d $out_dir/right_or ] && rm -r $out_dir/right_or
   mkdir -p $out_dir/right_or
-  r_lat_gen_bod=/home/brain/fsl/templates/right_lateral_geniculate_body.nii.gz
-  r_or_waypoints_list=/home/brain/fsl/templates/r_or_waypoints.txt
+  r_lat_gen_bod=$template_dir/right_lateral_geniculate_body.nii.gz
+  r_or_waypoints_list=$template_dir/r_or_waypoints.txt
   probtrackx2  -x $r_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
     --steplength=0.5 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 \
     --xfm=$bedpost_dir/xfms/standard2diff.mat --forcedir --opd \
@@ -218,8 +220,8 @@ then
   (
   [ -d $out_dir/left_or ] && rm -r $out_dir/left_or
   mkdir -p $out_dir/left_or
-  l_lat_gen_bod=/home/brain/fsl/templates/left_lateral_geniculate_body.nii.gz
-  l_or_waypoints_list=/home/brain/fsl/templates/l_or_waypoints.txt
+  l_lat_gen_bod=$template_dir/left_lateral_geniculate_body.nii.gz
+  l_or_waypoints_list=$template_dir/l_or_waypoints.txt
   probtrackx2  -x $l_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
     --steplength=0.5 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 \
     --xfm=$bedpost_dir/xfms/standard2diff.mat --forcedir --opd \
