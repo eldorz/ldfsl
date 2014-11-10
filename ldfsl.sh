@@ -42,7 +42,11 @@ fi
 # if destination directory doesn't exist, create it
 if ! [ -d $out_dir ]
 then
-  mkdir $out_dir || echo "$0: Couldn't create $out_dir" >&2; exit 1
+  if ! mkdir $out_dir
+  then
+    echo "$0: Couldn't create $out_dir" >&2
+    exit 1
+  fi
 fi
 
 # if destination directory is non-empty, prompt to delete
@@ -89,8 +93,8 @@ then
   mv $out_dir/*bval $out_dir/bvals
 
   # write log
-  $end_time=`date +%s`
-  $elapsed=`expr \( $end_time - $start_time \) / 60`
+  end_time=`date +%s`
+  elapsed=`expr \( $end_time - $start_time \) / 60`
   echo "finished nii conversion at $elapsed min" >> $out_dir/ldfsl.log
 fi
 
@@ -140,6 +144,10 @@ then
   export FSLPARALLEL
   if [ -d "$out_dir.bedpostX" ]
   then
+    if [ -e "$out_dir.bedpostX/cancel" ]
+    then
+      $out_dir.bedpostX/cancel
+    fi
     rm -r "$out_dir.bedpostX"
   fi
   bedpostx $out_dir --nf=2 --fudge=1 --bi=1000
