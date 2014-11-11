@@ -20,6 +20,9 @@ str_dir=$1
 dti_dir=$2
 out_dir=$3
 
+# get directory of this script
+scriptdir=$(dirname $0);
+
 # check that directories contain dicom files
 if ! dcmftest $str_dir/* >/dev/null
 then
@@ -146,13 +149,18 @@ then
   then
     if [ -e "$out_dir.bedpostX/cancel" ]
     then
-      $out_dir.bedpostX/cancel
+      echo "Cancel all condor jobs before continuing? (recommended) (y/n)";
+      read answer
+      if [ "$answer" = 'y' ]
+      then
+        condor_rm -all
+      fi
     fi
-    rm -r "$out_dir.bedpostX"
+    rm -rf "$out_dir.bedpostX"
   fi
   bedpostx $out_dir --nf=2 --fudge=1 --bi=1000
   # wait for bedpost to complete
-  $out_dir.bedpostX/monitor
+  $scriptdir/monlog.pl $out_dir
   # write to log
   end_time=`date +%s`
   elapsed=`expr \( $end_time - $start_time \) / 60`
