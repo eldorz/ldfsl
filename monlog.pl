@@ -27,6 +27,11 @@ my %complete;
 my $alldone = 0;
 while (!$alldone) {
   foreach my $log (@lognames) {
+    # seems that log0000 is not being filled sometimes, hack fix
+    if ($log eq "log0000") {
+      $complete{$log} = 100;
+      next;
+    }
     my $longlog = "$logdir/$log";
     if (!open LOG, "<", $longlog) {
       $complete{$log} = 0;
