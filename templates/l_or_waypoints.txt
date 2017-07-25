@@ -1,1 +1,1 @@
-/home/brain/fsl/templates/left_visual_cortex.nii.gz
+/home/brain/ldfsl/templates/left_visual_cortex.nii.gz

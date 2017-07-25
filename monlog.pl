@@ -10,8 +10,11 @@ use strict;
 my ($datadir) = @ARGV;
 
 my $fsldir = $ENV{'FSLDIR'};
+
 my $nslices = `"$fsldir"/bin/fslval "$datadir"/data dim3`;
 $nslices or die "$0 cannot determine number of slices\n";
+print "number of slices $nslices";
+exit;
 my @lognums = (0 .. $nslices - 1);
 my @lognames;
 foreach my $lognum (@lognums) {
@@ -32,6 +35,7 @@ while (!$alldone) {
       $complete{$log} = 100;
       next;
     }
+
     my $longlog = "$logdir/$log";
     if (!open LOG, "<", $longlog) {
       $complete{$log} = 0;
@@ -64,6 +68,11 @@ while (!$alldone) {
   }
   $total /= $nslices;
   printf "\nTotal %9.1f%% done\n", $total;
+
+  # sometimes stalls on last log, so check if eye.mat is present
+  if (-f "$datadir.bedpostX/xfms/eye.mat" ) {
+    $alldone = 1;
+  }
 
   if ($alldone) {
     if (-f "$datadir.bedpostX/xfms/eye.mat" ) {

@@ -1,1 +1,1 @@
-std_left_inferior_frontal_triangularis.nii.gz
+/home/brain/ldfsl/templates/std_left_inferior_frontal_triangularis.nii.gz

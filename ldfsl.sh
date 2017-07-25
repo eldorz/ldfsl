@@ -202,7 +202,7 @@ fi
 
 # perform probabilistic tracking corticospinal tract
 # NB change template directory as required
-template_dir=/home/brain/workspace/ldfsl/templates
+template_dir=/home/brain/ldfsl/templates
 if ! grep 'finished tracking' $out_dir/ldfsl.log > /dev/null
 then
   (
@@ -247,15 +247,18 @@ then
   lor_process=$!
 
   # perform probabilistic tracking left arcuate fasciculus
+  (
   [ -d $out_dir/left_arcuate ] && rm -r $out_dir/left_arcuate
   mkdir -p $out_dir/left_arcuate
   l_sup_temp=$template_dir/std_left_sup_temporal_gyrus_posterior.nii.gz
   l_arcuate_waypoints_list=$template_dir/l_arcuate_waypoints.txt
-  probtrackx2  -x $l_lat_gen_bod -l --onewaycondition -c 0.2 -S 2000 \
+
+  probtrackx2  -x $l_sup_temp -l --onewaycondition -c 0.2 -S 2000 \
     --steplength=0.5 -P 5000 --fibthresh=0.01 --distthresh=0.0 --sampvox=0.0 \
     --xfm=$bedpost_dir/xfms/standard2diff.mat --forcedir --opd \
     -s $bedpost_dir/merged -m $bedpost_dir/nodif_brain_mask \
-    --dir=$out_dir/left_or --waypoints=$l_or_waypoints_list --waycond=AND
+    --dir=$out_dir/left_arcuate --waypoints=$l_arcuate_waypoints_list \
+    --waycond=AND
   )&
   larcuate_process=$!
 
@@ -281,4 +284,5 @@ echo "finished all at $hours_elapsed h $mins_elapsed m" >> $out_dir/ldfsl.log
 # launch fslview
 fslview $out_dir/mprage_std -b 0,1000 $out_dir/cst/fdt_paths -b 1000,5000 \
   $out_dir/right_or/fdt_paths -b 1000,5000 \
-  $out_dir/left_or/fdt_paths -b 1000,5000       
+  $out_dir/left_or/fdt_paths -b 1000,5000 \
+  $out_dir/left_arcuate/fdt_paths -b 1000,5000      
